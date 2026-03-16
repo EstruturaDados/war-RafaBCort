@@ -21,28 +21,40 @@
 // --- Constantes Globais ---
 // Definem valores fixos para o número de territórios, missões e tamanho máximo de strings, facilitando a manutenção.
 
-int territorioMax = 5;
+#define territorioMax 5
+#define stringMax 30
 
 // --- Estrutura de Dados ---
 // Define a estrutura para um território, contendo seu nome, a cor do exército que o domina e o número de tropas.
-struct Territorio
+typedef struct
 {
-    char nome[20];
-char cor[20];
-int tropas;
+    char nome[stringMax];
+    char cor[stringMax];
+    int tropas;
+} Territorio;
 
-};
 // --- Protótipos das Funções ---
 // Declarações antecipadas de todas as funções que serão usadas no programa, organizadas por categoria.
+
 // Funções de setup e gerenciamento de memória:
 // Funções de interface com o usuário:
 // Funções de lógica principal do jogo:
 // Função utilitária:
+// limpar buffer
+void limparBuffer()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
+}
 
 // --- Função Principal (main) ---
 // Função principal que orquestra o fluxo do jogo, chamando as outras funções em ordem.
 int main()
 {
+    Territorio territorio[territorioMax];
+    int opcao = 0;
+    int totalTerritorio = 0;
     // 1. Configuração Inicial (Setup):
     // - Define o locale para português.
     // - Inicializa a semente para geração de números aleatórios com base no tempo atual.
@@ -52,6 +64,74 @@ int main()
 
     // 2. Laço Principal do Jogo (Game Loop):
     // - Roda em um loop 'do-while' que continua até o jogador sair (opção 0) ou vencer.
+    do
+    {
+        printf("Escolha uma opção\n");
+        printf("Para criar um territorio, digite 1\n");
+        printf("Para ver a lista de territorios, digite 2\n");
+        printf("Para sair, digite 0");
+        printf("\n");
+
+        scanf("%d", &opcao);
+
+        limparBuffer();
+
+        switch (opcao)
+        {
+        case 1:
+
+            if (totalTerritorio < territorioMax)
+            {
+
+                printf("escreva o nome do territorio\n ");
+                fgets(territorio[totalTerritorio].nome, stringMax, stdin);
+
+                printf("escreva a cor do exercito ocupante\n ");
+                fgets(territorio[totalTerritorio].cor, stringMax, stdin);
+
+                printf("escreva o numero de tropas no territorio\n ");
+                scanf("%d", &territorio[totalTerritorio].tropas);
+
+                territorio[totalTerritorio].nome[strcspn(territorio[totalTerritorio].nome, "\n")] = '\0';
+                territorio[totalTerritorio].cor[strcspn(territorio[totalTerritorio].cor, "\n")] = '\0';
+
+                totalTerritorio++;
+            }
+            else
+            {
+                printf("Maximo de territorios cadastrados");
+                printf("\n");
+            }
+            break;
+
+        case 2:
+
+            if (totalTerritorio == 0)
+            {
+                printf("Não há territorios cadastrados\n");
+            }
+            else
+            {
+                for (int i = 0; i < totalTerritorio; i++)
+                {
+                    printf("O territorio e: %s\n", territorio[i].nome);
+                    printf("A cor e: %s\n", territorio[i].cor);
+                    printf("Com %d tropas\n", territorio[i].tropas);
+                    printf("\n\n");
+                }
+            }
+            break;
+        case 0:
+            printf("encerrando o programa");
+            break;
+
+        default:
+            printf("Insira um valor valido");
+
+            break;
+        }
+
+    } while (opcao != 0);
     // - A cada iteração, exibe o mapa, a missão e o menu de ações.
     // - Lê a escolha do jogador e usa um 'switch' para chamar a função apropriada:
     //   - Opção 1: Inicia a fase de ataque.
