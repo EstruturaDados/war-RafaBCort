@@ -161,8 +161,8 @@ int main()
             for (int i = 0; i < totalTerritorio; i++)
             {
                 printf("%d - representa o país %s\n", i + 1, territorio[i].nome);
-                prinft("da cor %s\n", territorio[i].cor);
-                printf("e possui %d\n", &territorio[i].tropas);
+                printf("da cor %s\n", territorio[i].cor);
+                printf("e possui %d tropas\n", territorio[i].tropas);
             }
 
             scanf("%d %d\n", &atacante, &defensor);
