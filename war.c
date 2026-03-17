@@ -17,7 +17,8 @@
 // Inclusão das bibliotecas padrão necessárias para entrada/saída, alocação de memória, manipulação de strings e tempo.
 #include <stdio.h>
 #include <string.h>
-
+#include <stdlib.h>
+#include <time.h>
 // --- Constantes Globais ---
 // Definem valores fixos para o número de territórios, missões e tamanho máximo de strings, facilitando a manutenção.
 
@@ -39,6 +40,50 @@ typedef struct
 // Funções de setup e gerenciamento de memória:
 // Funções de interface com o usuário:
 // Funções de lógica principal do jogo:
+void cadastroTerritorio(Territorio *territorio, int *totalTerritorio)
+{
+
+    if (*totalTerritorio < territorioMax)
+    {
+
+        printf("escreva o nome do territorio\n ");
+        fgets(territorio[*totalTerritorio].nome, stringMax, stdin);
+
+        printf("escreva a cor do exercito ocupante\n ");
+        fgets(territorio[*totalTerritorio].cor, stringMax, stdin);
+
+        printf("escreva o numero de tropas no territorio\n ");
+        scanf("%d", &territorio[*totalTerritorio].tropas);
+
+        territorio[*totalTerritorio].nome[strcspn(territorio[*totalTerritorio].nome, "\n")] = '\0';
+        territorio[*totalTerritorio].cor[strcspn(territorio[*totalTerritorio].cor, "\n")] = '\0';
+
+        (*totalTerritorio)++;
+    }
+    else
+    {
+        printf("Maximo de territorios cadastrados");
+        printf("\n");
+    }
+}
+void verTerritorios(Territorio *territorio, int totalTerritorio)
+{
+
+    if (totalTerritorio == 0)
+    {
+        printf("Não há territorios cadastrados\n");
+    }
+    else
+    {
+        for (int i = 0; i < totalTerritorio; i++)
+        {
+            printf("O territorio e: %s\n", territorio[i].nome);
+            printf("A cor e: %s\n", territorio[i].cor);
+            printf("Com %d tropas\n", territorio[i].tropas);
+            printf("\n\n");
+        }
+    }
+}
 // Função utilitária:
 // limpar buffer
 void limparBuffer()
@@ -47,18 +92,37 @@ void limparBuffer()
     while ((c = getchar()) != '\n' && c != EOF)
         ;
 }
+// verificar se a alocacao foi concluida
+void VerificarAlocacao(void *ptr)
+{
+    if (ptr == NULL)
+    {
 
+        printf("falha ao alocar memoria");
+    }
+}
+
+// comando de ataque e comecar a partida
+
+void ataque(Territorio *territorio, int atacante, int defensor)
+{
+}
 // --- Função Principal (main) ---
 // Função principal que orquestra o fluxo do jogo, chamando as outras funções em ordem.
 int main()
 {
-    Territorio territorio[territorioMax];
+    Territorio *territorio;
     int opcao = 0;
+    // o totalterritorio tambem é o numero que representa o territorio no jogo +1
     int totalTerritorio = 0;
+    int atacante, defensor;
     // 1. Configuração Inicial (Setup):
     // - Define o locale para português.
     // - Inicializa a semente para geração de números aleatórios com base no tempo atual.
     // - Aloca a memória para o mapa do mundo e verifica se a alocação foi bem-sucedida.
+    territorio = (Territorio *)calloc(territorioMax, sizeof(Territorio));
+    VerificarAlocacao(territorio);
+
     // - Preenche os territórios com seus dados iniciais (tropas, donos, etc.).
     // - Define a cor do jogador e sorteia sua missão secreta.
 
@@ -69,6 +133,7 @@ int main()
         printf("Escolha uma opção\n");
         printf("Para criar um territorio, digite 1\n");
         printf("Para ver a lista de territorios, digite 2\n");
+        printf("Para começar a partida, digite 3\n ");
         printf("Para sair, digite 0");
         printf("\n");
 
@@ -80,47 +145,31 @@ int main()
         {
         case 1:
 
-            if (totalTerritorio < territorioMax)
-            {
-
-                printf("escreva o nome do territorio\n ");
-                fgets(territorio[totalTerritorio].nome, stringMax, stdin);
-
-                printf("escreva a cor do exercito ocupante\n ");
-                fgets(territorio[totalTerritorio].cor, stringMax, stdin);
-
-                printf("escreva o numero de tropas no territorio\n ");
-                scanf("%d", &territorio[totalTerritorio].tropas);
-
-                territorio[totalTerritorio].nome[strcspn(territorio[totalTerritorio].nome, "\n")] = '\0';
-                territorio[totalTerritorio].cor[strcspn(territorio[totalTerritorio].cor, "\n")] = '\0';
-
-                totalTerritorio++;
-            }
-            else
-            {
-                printf("Maximo de territorios cadastrados");
-                printf("\n");
-            }
+            cadastroTerritorio(territorio, &totalTerritorio);
             break;
 
         case 2:
 
-            if (totalTerritorio == 0)
-            {
-                printf("Não há territorios cadastrados\n");
-            }
-            else
-            {
-                for (int i = 0; i < totalTerritorio; i++)
-                {
-                    printf("O territorio e: %s\n", territorio[i].nome);
-                    printf("A cor e: %s\n", territorio[i].cor);
-                    printf("Com %d tropas\n", territorio[i].tropas);
-                    printf("\n\n");
-                }
-            }
+            verTerritorios(territorio, totalTerritorio);
+
             break;
+
+        case 3:
+
+            printf("Vamos começar o jogo!\n");
+            printf("digite um pais para atacar e um pais para defender, se quiser sair, aperte 0\n");
+            for (int i = 0; i < totalTerritorio; i++)
+            {
+                printf("%d - representa o país %s\n", i + 1, territorio[i].nome);
+                prinft("da cor %s\n", territorio[i].cor);
+                printf("e possui %d\n", &territorio[i].tropas);
+            }
+
+            scanf("%d %d\n", &atacante, &defensor);
+            limparBuffer();
+
+            break;
+
         case 0:
             printf("encerrando o programa");
             break;
@@ -141,6 +190,7 @@ int main()
 
     // 3. Limpeza:
     // - Ao final do jogo, libera a memória alocada para o mapa para evitar vazamentos de memória.
+    free(territorio);
 
     return 0;
 }
@@ -149,6 +199,7 @@ int main()
 
 // alocarMapa():
 // Aloca dinamicamente a memória para o vetor de territórios usando calloc.
+
 // Retorna um ponteiro para a memória alocada ou NULL em caso de falha.
 
 // inicializarTerritorios():
